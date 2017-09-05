@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include "../aREST/aREST.h"
 
 #define LED D0
 #define DEBUG_FLAG 1
@@ -15,11 +16,15 @@
 const int16_t BLINK_TIME = 100;
 const int16_t INIT_WAIT = 100;
 const int16_t RECHECK_TIME = 500;
-const char* SSID = "Apartment Sweden";
+const char* SSID = "Appartment Sweden 1404";
 const char* PASSW = "snabbit99";
 
+aREST rest = aREST();
 
 ESP8266WebServer server(80);
+
+int data_s;
+int no_of_times
 
 void debugPrint(const char* d_str) {
   if (DEBUG_FLAG) {
@@ -36,6 +41,10 @@ void flashLed(int16_t led_pin, int16_t repeat = 2) {
     digitalWrite(led_pin, 0);
     delay(flash_time);
   }
+}
+
+void ledCtrl(char* args) {
+
 }
 
 void handleRoot() {
@@ -59,6 +68,11 @@ void setup() {
   pinMode(LED, OUTPUT);
   Serial.begin(115200);
   delay(INIT_WAIT);
+
+  rest.variable("data_s", &data_str)
+  rest.variable("no_of_times" &no_of_times)
+
+  rest.function("ledCtrl", ledCtrl)
 
   Serial.print("Connecting");
   WiFi.begin(SSID, PASSW);
