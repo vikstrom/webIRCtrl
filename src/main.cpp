@@ -7,7 +7,6 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include "../aREST/aREST.h"
 
 #define LED D0
 #define DEBUG_FLAG 1
@@ -16,10 +15,9 @@
 const int16_t BLINK_TIME = 100;
 const int16_t INIT_WAIT = 100;
 const int16_t RECHECK_TIME = 500;
-const char* SSID = "test_ir";
-const char* PASSW = "farsan1902";
+const char* SSID = "Apartment Sweden";
+const char* PASSW = "snabbit99";
 
-aREST rest = aREST();
 
 ESP8266WebServer server(80);
 
