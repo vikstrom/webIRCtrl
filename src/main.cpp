@@ -6,7 +6,6 @@
 */
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include "../aREST/aREST.h"
 
 #define LED D0
@@ -16,15 +15,18 @@
 const int16_t BLINK_TIME = 100;
 const int16_t INIT_WAIT = 100;
 const int16_t RECHECK_TIME = 500;
-const char* SSID = "Appartment Sweden 1404";
-const char* PASSW = "snabbit99";
+// const char* SSID = "Apartment Sweden 1404";
+// const char* PASSW = "snabbit99";
+const char* SSID = "Tage";
+const char* PASSW = "W1llYs747AB";
 
 aREST rest = aREST();
 
-ESP8266WebServer server(80);
+WiFiServer server(80);
 
 int data_s;
-int no_of_times
+int no_of_times;
+int key;
 
 void debugPrint(const char* d_str) {
   if (DEBUG_FLAG) {
@@ -43,25 +45,13 @@ void flashLed(int16_t led_pin, int16_t repeat = 2) {
   }
 }
 
-void ledCtrl(char* args) {
-
+int ledCtrl(String arg) {
+  flashLed(LED, arg.toInt());
+  return 1;
 }
 
-void handleRoot() {
-  debugPrint("Sending 200 and text!");
-  server.send(200, "text/plain", "Wazzup?!");
-}
+int checkKey(String arg) {
 
-void handleLed() {
-  debugPrint("Trying to flash LED");
-  flashLed(LED, 5);
-  server.send(200, "text/plain", "OK");
-}
-
-void intit_server() {
-  debugPrint("intit_server");
-  server.on("/", handleRoot);
-  server.on("/flash", handleLed);
 }
 
 void setup() {
@@ -69,10 +59,15 @@ void setup() {
   Serial.begin(115200);
   delay(INIT_WAIT);
 
-  rest.variable("data_s", &data_str)
-  rest.variable("no_of_times" &no_of_times)
+  data_s = 0;
+  no_of_times = 5;
+  rest.variable((char* )"data_s", &data_s);
+  rest.variable((char* )"no_of_times", &no_of_times);
 
-  rest.function("ledCtrl", ledCtrl)
+  rest.function((char *)"ledCtrl", ledCtrl);
+
+  rest.set_id((char *)"1");
+  rest.set_name((char *)"nodeMCU");
 
   Serial.print("Connecting");
   WiFi.begin(SSID, PASSW);
@@ -89,10 +84,16 @@ void setup() {
   server.begin();
   Serial.println("Server started");
   Serial.println(WiFi.localIP());
-
-  intit_server();
 }
 
 void loop(void) {
-  server.handleClient();
+  // server.handleClient();
+  WiFiClient client = server.available();
+  if (!client)
+    return;
+
+  while(!client.available())
+    delay(1);
+
+  rest.handle(client);
 }
